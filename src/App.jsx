@@ -8,7 +8,7 @@ import {
   buscarTarefas,
   criarTarefa,
   excluirTarefa,
-  atualizarStatus
+  atualizarStatus,
 } from "./services/tarefaService.js";
 
 function App() {
@@ -28,9 +28,9 @@ function App() {
       const dados = await buscarTarefas();
       setTarefas(dados);
     } catch (error) {
-      console.error(error);
+      console.error(error); //Erro
       setErro(
-        "Não foi possível carregar as tarefas. Verifique se o JSON Server está rodando."
+        "Não foi possível carregar as tarefas. Verifique se o JSON Server está rodando.",
       );
     } finally {
       setCarregando(false);
@@ -40,54 +40,46 @@ function App() {
   async function adicionarTarefa(titulo) {
     try {
       setErro("");
-
+      //Erro
       const novaTarefa = await criarTarefa({
         titulo: titulo,
-        concluida: false
+        concluida: false,
       });
 
       setTarefas((listaAtual) => [...listaAtual, novaTarefa]);
     } catch (error) {
-      console.error(error);
+      console.error(error); //Erro
       setErro("Não foi possível cadastrar a tarefa.");
     }
   }
 
   async function removerTarefa(id) {
-
-  // Pede confirmação antes de excluir
-  const confirmar = window.confirm(
-    "Tem certeza que deseja excluir esta tarefa?"
-  );
-
-  // Se clicar em Cancelar, interrompe a função
-  if (!confirmar) {
-    return;
-  }
-
-  try {
-
-    setErro("");
-
-    // DELETE na API
-    await excluirTarefa(id);
-
-    // Remove a tarefa do estado
-    setTarefas((listaAtual) =>
-      listaAtual.filter(
-        (tarefa) => tarefa.id !== id
-      )
+    // Pede confirmação antes de excluir
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir esta tarefa?",
     );
 
-  } catch (error) {
+    // Se clicar em Cancelar, interrompe a função
+    if (!confirmar) {
+      return;
+    }
 
-    console.error(error);
+    try {
+      setErro("");
 
-    setErro("Não foi possível excluir a tarefa.");
+      // DELETE na API
+      await excluirTarefa(id);
 
+      // Remove a tarefa do estado
+      setTarefas((listaAtual) =>
+        listaAtual.filter((tarefa) => tarefa.id !== id),
+      );
+    } catch (error) {
+      console.error(error);
+
+      setErro("Não foi possível excluir a tarefa.");
+    }
   }
-
-}
 
   async function alterarTarefa(tarefa) {
     try {
@@ -95,13 +87,13 @@ function App() {
 
       const tarefaAtualizada = await atualizarStatus(
         tarefa.id,
-        !tarefa.concluida
+        !tarefa.concluida,
       );
 
       setTarefas((listaAtual) =>
         listaAtual.map((item) =>
-          item.id === tarefa.id ? tarefaAtualizada : item
-        )
+          item.id === tarefa.id ? tarefaAtualizada : item,
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -110,42 +102,34 @@ function App() {
   }
 
   return (
-  <>
-    <Header />
+    <>
+      <Header />
 
-    <main className="container">
+      <main className="container">
+        <section className="apresentacao">
+          <h1>Gerenciador de Tarefas</h1>
 
-      <section className="apresentacao">
-        <h1>Gerenciador de Tarefas</h1>
+          <p>React consumindo uma API simulada com JSON Server</p>
+        </section>
 
-        <p>
-          React consumindo uma API simulada com JSON Server
-        </p>
-      </section>
+        <FormTarefa onAdicionar={adicionarTarefa} />
 
-      <FormTarefa onAdicionar={adicionarTarefa} />
+        {erro && <p className="erro">{erro}</p>}
 
-      {erro && (
-        <p className="erro">
-          {erro}
-        </p>
-      )}
+        {carregando ? (
+          <p>Carregando...</p>
+        ) : (
+          <ListaTarefas
+            tarefas={tarefas}
+            onExcluir={removerTarefa}
+            onAlterar={alterarTarefa}
+          />
+        )}
+      </main>
 
-      {carregando ? (
-        <p>Carregando...</p>
-      ) : (
-        <ListaTarefas
-          tarefas={tarefas}
-          onExcluir={removerTarefa}
-          onAlterar={alterarTarefa}
-        />
-      )}
-
-    </main>
-
-    <Footer />
-  </>
-);
+      <Footer />
+    </>
+  );
 }
 
 export default App;
