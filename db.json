@@ -3,7 +3,7 @@
     {
       "id": 2,
       "titulo": "Aprender JSON Server",
-      "concluida": true
+      "concluida": false
     },
     {
       "id": 3,
@@ -16,7 +16,7 @@
       "id": 4
     },
     {
-      "titulo": "ESTUDAR HTML",
+      "titulo": "Aprender a Andar de Skate",
       "concluida": false,
       "id": 5
     }
