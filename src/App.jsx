@@ -54,27 +54,40 @@ function App() {
   }
 
   async function removerTarefa(id) {
-    const confirmar = window.confirm(
-      "Tem certeza que deseja excluir esta tarefa?"
+
+  // Pede confirmação antes de excluir
+  const confirmar = window.confirm(
+    "Tem certeza que deseja excluir esta tarefa?"
+  );
+
+  // Se clicar em Cancelar, interrompe a função
+  if (!confirmar) {
+    return;
+  }
+
+  try {
+
+    setErro("");
+
+    // DELETE na API
+    await excluirTarefa(id);
+
+    // Remove a tarefa do estado
+    setTarefas((listaAtual) =>
+      listaAtual.filter(
+        (tarefa) => tarefa.id !== id
+      )
     );
 
-    if (!confirmar) {
-      return;
-    }
+  } catch (error) {
 
-    try {
-      setErro("");
+    console.error(error);
 
-      await excluirTarefa(id);
+    setErro("Não foi possível excluir a tarefa.");
 
-      setTarefas((listaAtual) =>
-        listaAtual.filter((tarefa) => tarefa.id !== id)
-      );
-    } catch (error) {
-      console.error(error);
-      setErro("Não foi possível excluir a tarefa.");
-    }
   }
+
+}
 
   async function alterarTarefa(tarefa) {
     try {
@@ -97,36 +110,42 @@ function App() {
   }
 
   return (
-    <>
-      <Header />
+  <>
+    <Header />
 
-      <main className="container">
-        <section className="apresentacao">
-          <h1>Gerenciador de Tarefas</h1>
+    <main className="container">
 
-          <p>
-            React consumindo uma API simulada com JSON Server
-          </p>
-        </section>
+      <section className="apresentacao">
+        <h1>Gerenciador de Tarefas</h1>
 
-        <FormTarefa onAdicionar={adicionarTarefa} />
+        <p>
+          React consumindo uma API simulada com JSON Server
+        </p>
+      </section>
 
-        {erro && <p className="erro">{erro}</p>}
+      <FormTarefa onAdicionar={adicionarTarefa} />
 
-        {carregando ? (
-          <p>Carregando...</p>
-        ) : (
-          <ListaTarefas
-            tarefas={tarefas}
-            onExcluir={removerTarefa}
-            onAlterar={alterarTarefa}
-          />
-        )}
-      </main>
+      {erro && (
+        <p className="erro">
+          {erro}
+        </p>
+      )}
 
-      <Footer />
-    </>
-  );
+      {carregando ? (
+        <p>Carregando...</p>
+      ) : (
+        <ListaTarefas
+          tarefas={tarefas}
+          onExcluir={removerTarefa}
+          onAlterar={alterarTarefa}
+        />
+      )}
+
+    </main>
+
+    <Footer />
+  </>
+);
 }
 
 export default App;
